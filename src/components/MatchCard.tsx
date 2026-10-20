@@ -1,5 +1,84 @@
+// import { View, Text, StyleSheet } from "react-native";
+// import { Match } from "../api/matches";
+// import { COLORS, SPACING } from "../config/theme";
+
+// const STATUS_LABELS: Record<string, string> = {
+//   scheduled: "Запланирован",
+//   live: "В эфире",
+//   finished: "Завершен",
+//   postponed: "Отложен",
+//   canceled: "Отменен",
+// };
+
+// interface Props {
+//   match: Match;
+// }
+
+// const formatDate = (isoString: string | null) => {
+//   if (!isoString) return "Дата не назначена";
+//   return new Date(isoString).toLocaleString("ru-RU", {
+//     day: "numeric",
+//     month: "short",
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   });
+// };
+
+// export const MatchCard = ({ match }: Props) => {
+//   const hasScore = match.score !== null;
+//   const isLive = match.status === "live";
+
+//   return (
+//     <View style={styles.card}>
+//       <View style={styles.cardHeader}>
+//         <View style={styles.statusContainer}>
+//           <Text style={[styles.statusText, isLive && styles.statusLive]}>
+//             {STATUS_LABELS[match.status] || match.status}
+//           </Text>
+//           {isLive && match.minute !== undefined && (
+//             <Text style={styles.minuteText}>{match.minute}'</Text>
+//           )}
+//         </View>
+//         <Text style={styles.dateText}>{formatDate(match.startsAt)}</Text>
+//       </View>
+
+//       <View style={styles.teamsRow}>
+//         <View style={styles.teamBox}>
+//           <Text style={styles.teamName} numberOfLines={1}>
+//             {match.home.name}
+//           </Text>
+//           <Text style={styles.teamCity} numberOfLines={1}>
+//             {match.home.city}
+//           </Text>
+//         </View>
+
+//         <View style={styles.scoreBox}>
+//           {hasScore ? (
+//             <Text style={styles.scoreText}>
+//               {match.score!.home} : {match.score!.away}
+//             </Text>
+//           ) : (
+//             <Text style={styles.vsText}>—</Text>
+//           )}
+//         </View>
+
+//         <View style={[styles.teamBox, styles.teamBoxRight]}>
+//           <Text style={[styles.teamName, styles.textRight]} numberOfLines={1}>
+//             {match.away.name}
+//           </Text>
+//           <Text style={[styles.teamCity, styles.textRight]} numberOfLines={1}>
+//             {match.away.city}
+//           </Text>
+//         </View>
+//       </View>
+//     </View>
+//   );
+// };
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Match } from "../api/matches";
+import { FavoriteButton } from "./FavoriteButton";
+import { useFavorites } from "../hooks/useFavorites";
 import { COLORS, SPACING } from "../config/theme";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -25,6 +104,7 @@ const formatDate = (isoString: string | null) => {
 };
 
 export const MatchCard = ({ match }: Props) => {
+  const { isFavorite, toggleFavorite } = useFavorites();
   const hasScore = match.score !== null;
   const isLive = match.status === "live";
 
@@ -39,7 +119,14 @@ export const MatchCard = ({ match }: Props) => {
             <Text style={styles.minuteText}>{match.minute}'</Text>
           )}
         </View>
-        <Text style={styles.dateText}>{formatDate(match.startsAt)}</Text>
+
+        <View style={styles.headerRight}>
+          <Text style={styles.dateText}>{formatDate(match.startsAt)}</Text>
+          <FavoriteButton
+            active={isFavorite(match.id)}
+            onPress={() => toggleFavorite(match.id)}
+          />
+        </View>
       </View>
 
       <View style={styles.teamsRow}>
@@ -51,7 +138,6 @@ export const MatchCard = ({ match }: Props) => {
             {match.home.city}
           </Text>
         </View>
-
         <View style={styles.scoreBox}>
           {hasScore ? (
             <Text style={styles.scoreText}>
@@ -89,6 +175,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   statusContainer: { flexDirection: "row", alignItems: "center" },
   statusText: {
