@@ -16,6 +16,7 @@ import { EmptyView } from "../components/EmptyView";
 import { MatchCard } from "../components/MatchCard";
 import { MatchFilters } from "../components/MatchFilters";
 import { COLORS, SPACING } from "../config/theme";
+import { SearchInput } from "../components/SearchInput";
 
 export function MatchesScreen() {
   const {
@@ -27,7 +28,8 @@ export function MatchesScreen() {
     refresh,
     retry,
   } = useMatches();
-  const { filter, setFilter, filteredMatches } = useMatchFilter(matches);
+  const { filter, setFilter, query, setQuery, filteredMatches } =
+    useMatchFilter(matches);
 
   const showLoader = isLoading && !isRefreshing;
   const showError = !!error && !isRefreshing;
@@ -57,6 +59,7 @@ export function MatchesScreen() {
       ) : (
         <View style={styles.content}>
           <View style={styles.filterSection}>
+            <SearchInput value={query} onChange={setQuery} />
             <MatchFilters filter={filter} onChange={setFilter} />
             {lastUpdated && <UpdatedAgo since={lastUpdated} />}
           </View>
